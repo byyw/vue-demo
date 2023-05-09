@@ -1,17 +1,31 @@
 <template>
   <div id="app">
-    <p>
-      <router-link to="/">Go to Home</router-link>
-      <router-link to="/about">Go to About</router-link>
-    </p>
-    <router-view></router-view>
+    <el-container>
+      <el-aside width="200px" style="background-color: rgb(255, 255, 255)">
+        <el-menu :router="true" class="el-menu-demo">
+          <el-menu-item v-for="(r, i) in menuItems" :key="i" :index="String(i)" :route="r.path">
+            {{ r.meta.title }}
+          </el-menu-item>
+        </el-menu>
+      </el-aside>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
 <script>
 export default {
   name: 'App',
-  components: {
+  data() {
+    return {
+      menuItems: [],
+    };
+  },
+  created() {
+    this.menuItems = this.$router.getRoutes().filter(r => r.parent==null);
+    // console.log(this.menuItems)
   }
 }
 </script>

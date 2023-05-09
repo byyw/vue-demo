@@ -13,6 +13,9 @@
       <el-table-column prop="remark" label="备注">
       </el-table-column>
     </el-table>
+    <el-dialog title="设备类型" :visible.sync="dialogVisible">
+      <router-view @w_close="dialogClose" @w_success="dialogSuccess"></router-view>
+    </el-dialog>
   </div>
 </template>
 
@@ -20,30 +23,31 @@
 
 export default {
   name: 'DeviceTypeList',
-  components: {
-  },
   data() {
     return {
-      devList: [{
-      }]
+      devList: [],
+      dialogVisible: false
     }
   },
-  async mounted() {
+  async created() {
     this.devList = await this.$http.cors("/loans/Gw/getDeviceTypeList");
   },
   methods: {
     addDeviceType() {
-      this.$router.push('/addDeviceType')
+      if (this.$route.path !== "/DeviceTypeList/DeviceType") {
+        this.$router.push('/DeviceTypeList/DeviceType');
+      }
+      this.dialogVisible = true;
+    },
+    dialogClose(){
+      this.$router.back();
+      this.dialogVisible = false;
+    },
+    async dialogSuccess(){
+      this.$router.back();
+      this.dialogVisible = false;
+      this.devList = await this.$http.cors("/loans/Gw/getDeviceTypeList");
     }
   }
 }
 </script>
-<!-- 
-构思下，接下来的路线
-设备类型，而关于设备类型，应该如何管理，而流程又是怎样
-首先，设备如果要上网关，那么肯定得在设备端绑定好对应的端口才行，而在这一步，网关就已经能识别这个设备了。
-后续，实际上网关的工作到这一步就结束了，后续是平台的功能，如何管理这个设备。
-网关是通过协议与协议约定的id进行设备识别的。而平台这边，需要建立一个协议的子集，也就是设备类型为一个集合
-后续平台所有设备相关的操作都只能局限于一个集合之内，不允许跨集合的操作
-
- -->

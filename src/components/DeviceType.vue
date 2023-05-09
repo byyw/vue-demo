@@ -37,7 +37,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
-        <el-button>取消</el-button>
+        <el-button @click="onClose">取消</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -92,6 +92,10 @@ export default {
         pro_command: this.form.pro_command,
         remark: this.form.remark
       });
+      this.$emit("w_success");
+    },
+    onClose() {
+      this.$emit("w_close");
     }
   }
 }

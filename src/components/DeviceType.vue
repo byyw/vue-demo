@@ -80,7 +80,6 @@ export default {
       console.log(this.form.pro_command)
     },
     onSubmit() {
-      console.log(this.form);
       this.$http.cors("/loans/Gw/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
@@ -91,8 +90,15 @@ export default {
         net_name: this.form.net_code.message,
         pro_command: this.form.pro_command,
         remark: this.form.remark
-      });
-      this.$emit("w_success");
+      }).then(res => {
+        console.log(res);
+        this.$emit("w_success");
+      }).catch(err => {
+        console.log(err);
+        this.$alert(err, '错误', {
+          confirmButtonText: '确定'
+        });
+      })
     },
     onClose() {
       this.$emit("w_close");

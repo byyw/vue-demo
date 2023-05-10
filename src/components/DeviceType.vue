@@ -64,20 +64,19 @@ export default {
     }
   },
   async mounted() {
-    this.protocolList = await this.$http.cors("/loans/Gw/getProtocolList");
-    this.networkList = await this.$http.cors("/loans/Gw/getNetworkList");
+    this.protocolList = (await this.$http.cors("/loans/Gw/getProtocolList")).data;
+    this.networkList = (await this.$http.cors("/loans/Gw/getNetworkList")).data;
   },
   methods: {
     async proChangeEvent(value) {
-      this.commandList = await this.$http.cors("/loans/Gw/getProCommandList", {
+      this.commandList = (await this.$http.cors("/loans/Gw/getProCommandList", {
         typecode: value.param
-      });
+      })).data;
 
       this.form.pro_command = [];
       for (var i = 0; i < this.commandList.length; i++) {
         this.form.pro_command.push(this.commandList[i].code);
       }
-      console.log(this.form.pro_command)
     },
     onSubmit() {
       this.$http.cors("/loans/Gw/addDeviceType", {
@@ -85,16 +84,14 @@ export default {
         name: this.form.name,
         pro_code: this.form.pro_code.code,
         pro_name: this.form.pro_code.message,
-        pro_command_set: this.form.pro_code.param,
         net_code: this.form.net_code.code,
         net_name: this.form.net_code.message,
+        pro_command_set: this.form.pro_code.param,
         pro_command: this.form.pro_command,
         remark: this.form.remark
-      }).then(res => {
-        console.log(res);
+      }).then(() => {
         this.$emit("w_success");
       }).catch(err => {
-        console.log(err);
         this.$alert(err, '错误', {
           confirmButtonText: '确定'
         });

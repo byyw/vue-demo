@@ -8,7 +8,7 @@
       </el-table-column>
       <el-table-column prop="net_name" label="网络类型">
       </el-table-column>
-      <el-table-column prop="proCommand" label="协议指令">
+      <el-table-column prop="commands" label="协议指令">
       </el-table-column>
       <el-table-column prop="remark" label="备注">
       </el-table-column>
@@ -30,7 +30,7 @@ export default {
     }
   },
   async created() {
-    this.devList = await this.$http.cors("/loans/Gw/getDeviceTypeList");
+    this.devList = (await this.$http.cors("/loans/Gw/getDeviceTypeList")).data;
   },
   methods: {
     addDeviceType() {
@@ -46,7 +46,7 @@ export default {
     async dialogSuccess(){
       this.$router.back();
       this.dialogVisible = false;
-      this.devList = await this.$http.cors("/loans/Gw/getDeviceTypeList");
+      this.devList = (await this.$http.cors("/loans/Gw/getDeviceTypeList")).data;
     }
   }
 }

@@ -10,7 +10,7 @@
       </el-form-item>
 
       <el-form-item label="协议类型">
-        <el-select v-model="form.pro_code" value-key="code" placeholder="请选择协议类型" @change="proChangeEvent">
+        <el-select v-model="form.pro_code" value-key="code" placeholder="请选择协议类型" @change="handleProChange">
           <el-option v-for=" pro in protocolList" :key="pro.code" :label="pro.message" :value="pro">
           </el-option>
         </el-select>
@@ -64,12 +64,16 @@ export default {
     }
   },
   async mounted() {
-    this.protocolList = (await this.$http.cors("/loans/Gw/getProtocolList")).data;
-    this.networkList = (await this.$http.cors("/loans/Gw/getNetworkList")).data;
+    this.protocolList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList", {
+      typecode: "protocol"
+    })).data;
+    this.networkList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList",{
+      typecode: "network"
+    })).data;
   },
   methods: {
-    async proChangeEvent(value) {
-      this.commandList = (await this.$http.cors("/loans/Gw/getProCommandList", {
+    async handleProChange(value) {
+      this.commandList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList", {
         typecode: value.param
       })).data;
 
@@ -79,7 +83,7 @@ export default {
       }
     },
     onSubmit() {
-      this.$http.cors("/loans/Gw/addDeviceType", {
+      this.$http.cors("/loans/device_manager/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
         pro_code: this.form.pro_code.code,
@@ -89,8 +93,13 @@ export default {
         pro_command_set: this.form.pro_code.param,
         pro_command: this.form.pro_command,
         remark: this.form.remark
-      }).then(() => {
-        this.$emit("w_success");
+      }).then((res) => {
+        if (res.code == 0)
+          this.$emit("w_success");
+        else
+          this.$alert(res.msg, '错误', {
+            confirmButtonText: '确定'
+          });
       }).catch(err => {
         this.$alert(err, '错误', {
           confirmButtonText: '确定'

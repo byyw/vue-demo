@@ -83,7 +83,7 @@ export default {
       }
     },
     onSubmit() {
-      this.$http.cors("/loans/device_manager/addDeviceType", {
+      this.$http.cors("/loans/device_type_manager/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
         pro_code: this.form.pro_code.code,

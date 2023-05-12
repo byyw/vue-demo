@@ -1,13 +1,16 @@
 <template>
   <div>
+    <el-input v-model="search.name" placeholder="类型名称" style="width:200px"></el-input>
+    <el-input v-model="search.pro_code" placeholder="协议类型" style="width:200px"></el-input>
+    <el-input v-model="search.net_code" placeholder="网络类型" style="width:200px"></el-input>
+    <el-button type="primary" @click="refreshDeviceTypeList">查询</el-button>
     <el-button type="primary" @click="addDeviceType">添加</el-button>
-    <el-button type="primary" @click="refreshDeviceTypeList">刷新</el-button>
     <el-button type="primary" @click="delDeviceType">删除</el-button>
-    <el-table 
-      ref="deviceTypeList"
-      :data="devList"
-      highlight-current-row
-      @current-change="handleCurrentChange"
+    <div class="block">
+      <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size" @current-change="handlePageChange">
+      </el-pagination>
+    </div>
+    <el-table ref="deviceTypeList" :data="devList" highlight-current-row @current-change="handleCurrentChange"
       style="width: 100%">
       <el-table-column prop="code" label="类型代码" width="180">
       </el-table-column>
@@ -22,7 +25,6 @@
       <el-table-column prop="remark" label="备注">
       </el-table-column>
     </el-table>
-
     <el-dialog title="设备类型" :visible.sync="dialogVisible">
       <router-view @w_close="dialogClose" @w_success="dialogSuccess"></router-view>
     </el-dialog>
@@ -37,11 +39,21 @@ export default {
     return {
       devList: [],
       dialogVisible: false,
-      currentRow: null
+      currentRow: null,
+      search:{
+        name: "",
+        pro_code:"",
+        net_code:""
+      },
+      page:{
+        total:0,
+        size:10,
+        pos:1
+      }
     }
   },
   async created() {
-    this.devList = (await this.$http.cors("/loans/device_manager/getDeviceTypeList")).data;
+    this.refreshDeviceTypeList();
   },
   methods: {
     addDeviceType() {
@@ -50,16 +62,23 @@ export default {
       }
       this.dialogVisible = true;
     },
-    refreshDeviceTypeList(){
-      this.$http.cors("/loans/device_manager/getDeviceTypeList").then((res)=>{
+    refreshDeviceTypeList() {
+      this.page.pos = 1;
+      this.$http.cors("/loans/device_type_manager/getDeviceTypeList",{
+        name: this.search.name,
+        pro_code: this.search.pro_code,
+        net_code: this.search.net_code,
+        page:this.page
+      }).then((res) => {
+        this.page.total = res.count;
         this.devList = res.data;
       })
     },
-    delDeviceType(){
-      this.$http.cors("/loans/device_manager/delDeviceType",{
+    delDeviceType() {
+      this.$http.cors("/loans/device_type_manager/delDeviceType", {
         "code": this.currentRow.code
-      }).then((res)=>{
-        if(res.code == 0){
+      }).then((res) => {
+        if (res.code == 0) {
           this.refreshDeviceTypeList();
         } else {
           this.$alert(res.msg, '错误', {
@@ -68,14 +87,18 @@ export default {
         }
       })
     },
-    handleCurrentChange(val){
+    handleCurrentChange(val) {
       this.currentRow = val;
     },
-    dialogClose(){
+    handlePageChange(val){
+      this.page.pos = val;
+      this.refreshDeviceTypeList();
+    },
+    dialogClose() {
       this.$router.back();
       this.dialogVisible = false;
     },
-    async dialogSuccess(){
+    async dialogSuccess() {
       this.$router.back();
       this.dialogVisible = false;
       this.refreshDeviceTypeList();

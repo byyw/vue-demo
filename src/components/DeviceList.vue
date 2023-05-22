@@ -2,7 +2,7 @@
     <div>
         <el-input v-model="search.state" placeholder="状态" style="width:200px" />
         <el-input v-model="search.name" placeholder="设备名称" style="width:200px" />
-        <el-input v-model="search.type" placeholder="设备类型" style="width:200px" />
+        <el-input v-model="search.type_name" placeholder="设备类型" style="width:200px" />
         <el-input v-model="search.number" placeholder="终端号" style="width:200px" />
         <el-input v-model="search.sim_no" placeholder="SIM卡号" style="width:200px" />
         <el-input v-model="search.address" placeholder="网络地址" style="width:200px" />
@@ -10,7 +10,7 @@
         <el-button type="primary" @click="updateDevice">修改</el-button>
         <el-button type="primary" @click="bindDevice">绑定</el-button>
         <el-button type="primary" @click="unbindDevice">解绑</el-button>
-        <el-button type="primary" @click="cleanUnbindDevice">清除未注册-离线设备</el-button>
+        <el-button type="primary" @click="cleanUnbindOfflineDevice">清除未绑定-离线设备</el-button>
         <div class="block">
             <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size"
                 @current-change="handlePageChange">
@@ -45,7 +45,7 @@ export default {
             search: {
                 state: "",
                 name: "",
-                type: "",
+                type_name: "",
                 number: "",
                 sim_no: "",
                 address: ""
@@ -66,7 +66,7 @@ export default {
             this.$http.cors("/loans/device_manager/getDeviceList", {
                 state: this.search.state,
                 name: this.search.name,
-                type: this.search.type,
+                typeName: this.search.type_name,
                 number: this.search.number,
                 sim_no: this.search.sim_no,
                 address: this.search.address,
@@ -99,7 +99,7 @@ export default {
             })
         },
         updateDevice(){
-            if(this.currentRow.state==0 || this.currentRow.state==1){
+            if(this.currentRow.type == ''){
                 this.$alert("设备未注册，无法修改", '错误', {
                     confirmButtonText: '确定'
                 });
@@ -114,8 +114,8 @@ export default {
             });
             this.dialogVisible = true;
         },
-        cleanUnbindDevice() {
-            this.$http.cors("/loans/device_manager/cleanUnbindDevice", {}).then((res) => {
+        cleanUnbindOfflineDevice() {
+            this.$http.cors("/loans/device_manager/cleanUnbindOfflineDevice", {}).then((res) => {
                 if (res.code == 0) {
                     this.refreshDeviceList();
                 } else {

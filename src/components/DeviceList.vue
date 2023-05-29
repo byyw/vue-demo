@@ -21,14 +21,24 @@
             <!-- <el-table-column type="selection" width="55" /> -->
             <el-table-column prop="name" label="设备名称" width="180" />
             <el-table-column prop="type_name" label="设备类型" width="180" />
-            <el-table-column prop="state" label="状态" />
+            <el-table-column label="状态" >
+                <template slot-scope="scope">
+                    <span>{{ scope.row.tcp_state }} , {{ scope.row.ws_state }} , {{ scope.row.http_state }}</span>
+                </template>
+            </el-table-column>
             <el-table-column prop="number" label="终端号" />
             <el-table-column prop="sim_no" label="SIM卡号" />
             <el-table-column prop="online_time" label="上线时间" />
             <el-table-column prop="address" label="网络地址" />
             <el-table-column prop="remark" label="备注" />
+            <el-table-column label="操作" >
+                <template slot-scope="scope">
+                    <el-button type="primary" size="mini" @click="showData(scope.row)">数据</el-button>
+                    <el-button type="primary" size="mini" @click="showVideo(scope.row)">视频</el-button>
+                </template>
+            </el-table-column>
         </el-table>
-        <el-dialog title="设备类型" :visible.sync="dialogVisible">
+        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
             <router-view @w_close="dialogClose" @w_success="dialogSuccess"></router-view>
         </el-dialog>
     </div>
@@ -41,6 +51,7 @@ export default {
         return {
             deviceList: [],
             dialogVisible: false,
+            dialogTitle: "",
             currentRow: null,
             search: {
                 state: "",
@@ -83,7 +94,7 @@ export default {
                     opt: "bind"
                 }
             });
-            this.dialogVisible = true;
+            this.dialogDisplay("绑定设备");
         },
         unbindDevice() {
             this.$http.cors("/loans/device_manager/unbindDevice", {
@@ -112,7 +123,7 @@ export default {
                     id: this.currentRow.id
                 }
             });
-            this.dialogVisible = true;
+            this.dialogDisplay("修改设备");
         },
         cleanUnbindOfflineDevice() {
             this.$http.cors("/loans/device_manager/cleanUnbindOfflineDevice", {}).then((res) => {
@@ -125,6 +136,28 @@ export default {
                 }
             })
         },
+        showData(row){
+            if(row.pro_code == 0){
+                this.$router.push({
+                    path :"/DeviceList/GpsDataList",
+                    query :{
+                        number: row.number
+                    }
+                });
+                this.dialogDisplay("设备数据");   
+            }
+        },
+        showVideo(row){
+            if(row.pro_code == 0){
+                this.$router.push({
+                    path :"/DeviceList/GpsVideoList",
+                    query :{
+                        number: row.number
+                    }
+                });
+                this.dialogDisplay("设备视频");
+            }
+        },
         handleCurrentChange(val) {
             this.currentRow = val;
         },
@@ -132,13 +165,16 @@ export default {
             this.page.pos = val;
             this.refreshDeviceList();
         },
+        dialogDisplay(title){
+            this.dialogTitle = title;
+            this.dialogVisible = true;
+        },
         dialogClose() {
             this.$router.back();
             this.dialogVisible = false;
         },
         dialogSuccess() {
-            this.$router.back();
-            this.dialogVisible = false;
+            this.dialogClose();
             this.refreshDeviceList();
         }
     }

@@ -35,7 +35,22 @@ export const constantRoutes = [
                 path:"DeviceItem",
                 component: () => import('@/components/DeviceItem.vue'),
                 meta: { title: '设备' }
+            },{
+                path:"GpsDataList",
+                component: () => import('@/components/data/GpsDataList.vue'),
+                meta: { title: '定位数据' }
+            },{
+                path:"GpsVideoList",
+                component: () => import('@/components/data/GpsVideoList.vue'),
+                meta: { title: '定位视频' }
             }
+        ]
+    },
+    {
+        path: '/InterfaceTest',
+        component: () => import('@/components/InterfaceTest.vue'),
+        meta: { title: '接口测试' },
+        children: [
         ]
     },
 ]

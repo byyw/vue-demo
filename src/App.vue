@@ -1,6 +1,8 @@
 <template>
   <div id="app">
     <el-container>
+
+
       <el-aside width="200px" style="background-color: rgb(255, 255, 255)">
         <el-menu :router="true" class="el-menu-demo">
           <el-menu-item v-for="(r, i) in menuItems" :key="i" :index="String(i)" :route="r.path">
@@ -8,6 +10,8 @@
           </el-menu-item>
         </el-menu>
       </el-aside>
+
+
       <el-main>
         <router-view></router-view>
       </el-main>

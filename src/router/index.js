@@ -4,14 +4,14 @@ import VueRouter from 'vue-router';
 const originalPush = VueRouter.prototype.push
 
 VueRouter.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err)
+    return originalPush.call(this, location).catch(err => err)
 }
 Vue.use(VueRouter);
 
 export const constantRoutes = [
     {
         path: '/',
-        component: () => import('@/components/DeviceTypeList.vue'), 
+        component: () => import('@/components/DeviceTypeList.vue'),
         meta: { title: '首页' }
     },
     {
@@ -40,5 +40,6 @@ export const constantRoutes = [
     },
 ]
 export default new VueRouter({
+    mode: "hash",
     routes: constantRoutes
 });

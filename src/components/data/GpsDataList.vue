@@ -1,13 +1,13 @@
 <template>
     <div>
         <el-button type="primary" @click="refreshGpsDataList">刷新</el-button>
-        <el-button type="primary" @click="playVideo">视频</el-button>
         <div class="block">
             <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size"
                 @current-change="handlePageChange">
             </el-pagination>
         </div>
-        <el-table ref="gpsList" :data="gpsList" highlight-current-row :header-row-class-name="headerRowClassName" max-height="800px">
+        <el-table ref="gpsList" :data="gpsList" highlight-current-row 
+            max-height="800px">
             <!-- <el-table-column prop="id" label="主键" /> -->
             <!-- <el-table-column prop="alarm" label="报警标志" />
             <el-table-column prop="status_field" label="状态位" /> -->
@@ -24,118 +24,117 @@
             <el-table-column prop="glat" label="高德纬度" />
             <el-table-column prop="glng" label="高德经度" />
             <!-- <el-table-column prop="xh_vehicle_id" label="xh_vehicle 表id" /> -->
-            <el-table-column prop="state" label="状态" >
+            <el-table-column prop="state" label="状态">
                 <template slot-scope="scope">
                     <span>{{
-                            scope.row.state=="3"?'离线': 
-                            scope.row.state=="7"?'在线-行驶':
-                            scope.row.state=="8"?'在线-行驶-报警':
-                            scope.row.state=="9"?'在线-停车-ACC关':
-                            scope.row.state=="10"?'在线-停车-ACC开':
-                            scope.row.state=="11"?'在线-停车-ACC关-报警':
-                            scope.row.state=="12"?'在线-停车-ACC开-报警':
-                            scope.row.state=="13"?'在线-无效定位':scope.row.stat
+                        scope.row.state == "3" ? '离线' :
+                        scope.row.state == "7" ? '在线-行驶' :
+                            scope.row.state == "8" ? '在线-行驶-报警' :
+                                scope.row.state == "9" ? '在线-停车-ACC关' :
+                                    scope.row.state == "10" ? '在线-停车-ACC开' :
+                                        scope.row.state == "11" ? '在线-停车-ACC关-报警' :
+                                            scope.row.state == "12" ? '在线-停车-ACC开-报警' :
+                                                scope.row.state == "13" ? '在线-无效定位' : scope.row.stat
                     }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="acc_stutus" label="ACC" >
+            <el-table-column prop="acc_stutus" label="ACC">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.acc_stutus==0?'关':'开' }}</span>
+                    <span>{{ scope.row.acc_stutus == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="positioning" label="定位" >
+            <el-table-column prop="positioning" label="定位">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.positioning==0?'关':'开' }}</span>
+                    <span>{{ scope.row.positioning == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="latitudes" label="" >
+            <el-table-column prop="latitudes" label="">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.latitudes==0?'北纬':'南纬' }}</span>
+                    <span>{{ scope.row.latitudes == 0 ? '北纬' : '南纬' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="through" label="" >
+            <el-table-column prop="through" label="">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.through==0?'东经':'西经' }}</span>
+                    <span>{{ scope.row.through == 0 ? '东经' : '西经' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="" >
+            <el-table-column prop="status" label="">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.status==0?'运营':'停运' }}</span>
+                    <span>{{ scope.row.status == 0 ? '运营' : '停运' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="keep_secret" label="" >
+            <el-table-column prop="keep_secret" label="">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.keep_secret==0?'经纬度未经保密插件加密':'经纬度已经保密插件加密' }}</span>
+                    <span>{{ scope.row.keep_secret == 0 ? '经纬度未经保密插件加密' : '经纬度已经保密插件加密' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="fully_loaded_state"
-                label="载况" >
+            <el-table-column prop="fully_loaded_state" label="载况">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.fully_loaded_state=="00"?'空车':
-                            scope.row.fully_loaded_state=="01"?'半载':
-                            scope.row.fully_loaded_state=="10"?'保留':
-                            scope.row.fully_loaded_state=="11"?'满载':scope.row.fully_loaded_state
+                    <span>{{ scope.row.fully_loaded_state == "00" ? '空车' :
+                        scope.row.fully_loaded_state == "01" ? '半载' :
+                            scope.row.fully_loaded_state == "10" ? '保留' :
+                                scope.row.fully_loaded_state == "11" ? '满载' : scope.row.fully_loaded_state
                     }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="oil_way" label="油路" >
+            <el-table-column prop="oil_way" label="油路">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.oil_way==0?'油路正常':'油路断开' }}</span>
+                    <span>{{ scope.row.oil_way == 0 ? '油路正常' : '油路断开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="circuit" label="电路" >
+            <el-table-column prop="circuit" label="电路">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.circuit==0?'电路正常':'电路断开' }}</span>
+                    <span>{{ scope.row.circuit == 0 ? '电路正常' : '电路断开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="car_unlock" label="车门" >
+            <el-table-column prop="car_unlock" label="车门">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.car_unlock==0?'车门解锁':'车门加锁' }}</span>
+                    <span>{{ scope.row.car_unlock == 0 ? '车门解锁' : '车门加锁' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="front_door" label="前门" >
+            <el-table-column prop="front_door" label="前门">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.front_door==0?'关':'开' }}</span>
+                    <span>{{ scope.row.front_door == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="middle_door" label="中门" >
+            <el-table-column prop="middle_door" label="中门">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.middle_door==0?'关':'开' }}</span>
+                    <span>{{ scope.row.middle_door == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="back_door" label="后门" >
+            <el-table-column prop="back_door" label="后门">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.back_door==0?'关':'开' }}</span>
+                    <span>{{ scope.row.back_door == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="drive_door" label="驾驶席门" >
+            <el-table-column prop="drive_door" label="驾驶席门">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.drive_door==0?'关':'开' }}</span>
+                    <span>{{ scope.row.drive_door == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="customize" label="自定义" >
+            <el-table-column prop="customize" label="自定义">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.customize==0?'关':'开' }}</span>
+                    <span>{{ scope.row.customize == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="gps_satellite" label="GPS" >
+            <el-table-column prop="gps_satellite" label="GPS">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.gps_satellite==0?'关':'开' }}</span>
+                    <span>{{ scope.row.gps_satellite == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="beidou_satellite" label="北斗" >
+            <el-table-column prop="beidou_satellite" label="北斗">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.beidou_satellite==0?'关':'开' }}</span>
+                    <span>{{ scope.row.beidou_satellite == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="glonass_satellite" label="GLONASS" >
+            <el-table-column prop="glonass_satellite" label="GLONASS">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.glonass_satellite==0?'关':'开' }}</span>
+                    <span>{{ scope.row.glonass_satellite == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
-            <el-table-column prop="galileo_satellite" label="Galileo" >
+            <el-table-column prop="galileo_satellite" label="Galileo">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.galileo_satellite==0?'关':'开' }}</span>
+                    <span>{{ scope.row.galileo_satellite == 0 ? '关' : '开' }}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="urgent_status" label="紧急报警" />
@@ -191,7 +190,7 @@
             <el-table-column prop="overload" label="客车超员报警" />
             <el-table-column prop="abnormal_drive" label="异常驾驶行为报警" />
             <el-table-column prop="memory_to_limit" label="特殊报警录像达到存储阈值报警" />
-            <el-table-column prop="lose_alarm" label="视频信号丢失报警状态" >
+            <el-table-column prop="lose_alarm" label="视频信号丢失报警状态">
                 <template slot-scope="scope">
                     <span>{{ scope.row.lose_alarm.toString(2) }}</span>
                 </template>
@@ -210,6 +209,12 @@
 <script>
 export default {
     name: "GpsDataList",
+    props: {
+        number: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return {
             gpsList: [],
@@ -220,24 +225,28 @@ export default {
             }
         }
     },
+    watch: {
+        number() {
+            this.refreshGpsDataList();
+        }
+    },
     mounted() {
         this.refreshGpsDataList();
     },
     methods: {
         refreshGpsDataList() {
-            console.log(123);
-            this.$http.cors("/loans/gps_data_manager/getGpsDataList", {
-                number: this.$route.query.number,
+            this.$http.cors("php","/loans/gps_data_manager/getGpsDataList", {
+                number: this.number,
                 page: this.page
             }).then((res) => {
                 this.page.total = res.count;
                 this.gpsList = res.data;
             })
         },
-        playVideo(){
-
-        }
-        
+        handlePageChange(val) {
+            this.page.pos = val;
+            this.refreshGpsDataList();
+        },
     }
 }
 </script>

@@ -21,7 +21,7 @@
             <!-- <el-table-column type="selection" width="55" /> -->
             <el-table-column prop="name" label="设备名称" width="180" />
             <el-table-column prop="type_name" label="设备类型" width="180" />
-            <el-table-column label="状态" >
+            <el-table-column label="状态">
                 <template slot-scope="scope">
                     <span>{{ scope.row.tcp_state }} , {{ scope.row.ws_state }} , {{ scope.row.http_state }}</span>
                 </template>
@@ -31,22 +31,37 @@
             <el-table-column prop="online_time" label="上线时间" />
             <el-table-column prop="address" label="网络地址" />
             <el-table-column prop="remark" label="备注" />
-            <el-table-column label="操作" >
+            <el-table-column label="操作">
                 <template slot-scope="scope">
                     <el-button type="primary" size="mini" @click="showData(scope.row)">数据</el-button>
-                    <el-button type="primary" size="mini" @click="showVideo(scope.row)">视频</el-button>
+                    <el-button type="primary" size="mini" @click="showVideo(scope.row)">实时</el-button>
+                    <el-button type="primary" size="mini" @click="showHisVideo(scope.row)">回放</el-button>
                 </template>
             </el-table-column>
         </el-table>
         <el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
-            <router-view @w_close="dialogClose" @w_success="dialogSuccess"></router-view>
+            <DeviceItem v-if="dialogComponent === 'DeviceItem'" :opt="deviceItem.opt" :id="deviceItem.id"></DeviceItem>
+            <GpsDataList v-if="dialogComponent === 'GpsDataList'" :number="selNumber"></GpsDataList>
+            <GpsVideoList v-if="dialogComponent === 'GpsVideoList'" :number="selNumber"></GpsVideoList>
+            <GpsHisVideoList v-if="dialogComponent === 'GpsHisVideoList'" :number="selNumber"></GpsHisVideoList>
         </el-dialog>
     </div>
 </template>
 
 <script>
+import DeviceItem from "./DeviceItem.vue";
+import GpsDataList from "./data/GpsDataList.vue";
+import GpsVideoList from "./data/GpsVideoList.vue";
+import GpsHisVideoList from "./data/GpsHisVideoList.vue";
+
 export default {
     name: "DeviceList",
+    components: {
+        DeviceItem: DeviceItem,
+        GpsDataList: GpsDataList,
+        GpsVideoList: GpsVideoList,
+        GpsHisVideoList: GpsHisVideoList,
+    },
     data() {
         return {
             deviceList: [],
@@ -65,6 +80,12 @@ export default {
                 total: 0,
                 size: 10,
                 pos: 1
+            },
+            dialogComponent: "",
+            selNumber: "",
+            deviceItem: {
+                opt: "",
+                id: ""
             }
         }
     },
@@ -74,7 +95,7 @@ export default {
     methods: {
         refreshDeviceList() {
             this.page.pos = 1;
-            this.$http.cors("/loans/device_manager/getDeviceList", {
+            this.$http.cors("php","/loans/device_manager/getDeviceList", {
                 state: this.search.state,
                 name: this.search.name,
                 typeName: this.search.type_name,
@@ -88,16 +109,11 @@ export default {
             })
         },
         bindDevice() {
-            this.$router.push({
-                path :"/DeviceList/DeviceItem",
-                query :{
-                    opt: "bind"
-                }
-            });
-            this.dialogDisplay("绑定设备");
+            this.deviceItem.opt = "bind";
+            this.dialogDisplay("绑定设备", "DeviceItem");
         },
         unbindDevice() {
-            this.$http.cors("/loans/device_manager/unbindDevice", {
+            this.$http.cors("php","/loans/device_manager/unbindDevice", {
                 id: this.currentRow.id
             }).then((res) => {
                 if (res.code == 0) {
@@ -109,24 +125,19 @@ export default {
                 }
             })
         },
-        updateDevice(){
-            if(this.currentRow.type == ''){
+        updateDevice() {
+            if (this.currentRow.type == '') {
                 this.$alert("设备未注册，无法修改", '错误', {
                     confirmButtonText: '确定'
                 });
                 return;
             }
-            this.$router.push({
-                path :"/DeviceList/DeviceItem",
-                query :{
-                    opt: "update",
-                    id: this.currentRow.id
-                }
-            });
-            this.dialogDisplay("修改设备");
+            this.deviceItem.opt = "update";
+            this.deviceItem.id = "this.currentRow.id";
+            this.dialogDisplay("修改设备","DeviceItem");
         },
         cleanUnbindOfflineDevice() {
-            this.$http.cors("/loans/device_manager/cleanUnbindOfflineDevice", {}).then((res) => {
+            this.$http.cors("php","/loans/device_manager/cleanUnbindOfflineDevice", {}).then((res) => {
                 if (res.code == 0) {
                     this.refreshDeviceList();
                 } else {
@@ -136,26 +147,22 @@ export default {
                 }
             })
         },
-        showData(row){
-            if(row.pro_code == 0){
-                this.$router.push({
-                    path :"/DeviceList/GpsDataList",
-                    query :{
-                        number: row.number
-                    }
-                });
-                this.dialogDisplay("设备数据");   
+        showData(row) {
+            if (row.pro_code == 0) {
+                this.selNumber = row.number;
+                this.dialogDisplay("设备数据","GpsDataList");
             }
         },
-        showVideo(row){
-            if(row.pro_code == 0){
-                this.$router.push({
-                    path :"/DeviceList/GpsVideoList",
-                    query :{
-                        number: row.number
-                    }
-                });
-                this.dialogDisplay("设备视频");
+        async showVideo(row) {
+            if (row.pro_code == 0) {
+                this.selNumber = row.number;
+                this.dialogDisplay("设备视频","GpsVideoList");
+            }
+        },
+        showHisVideo(row) {
+            if (row.pro_code == 0) {
+                this.selNumber = row.number;
+                this.dialogDisplay("历史视频", "GpsHisVideoList");
             }
         },
         handleCurrentChange(val) {
@@ -165,13 +172,14 @@ export default {
             this.page.pos = val;
             this.refreshDeviceList();
         },
-        dialogDisplay(title){
+        dialogDisplay(title, component) {
             this.dialogTitle = title;
             this.dialogVisible = true;
+            this.dialogComponent = component;
         },
         dialogClose() {
-            this.$router.back();
             this.dialogVisible = false;
+            this.dialogComponent = "";
         },
         dialogSuccess() {
             this.dialogClose();

@@ -54,7 +54,7 @@ export default {
     methods: {
         addDeviceType() {
             this.$router.push({
-                path :"/DeviceTypeList/DeviceTypeItem",
+                path :"/device_type_list/device_type_item",
                 query :{
                     opt: "insert"
                 }
@@ -63,7 +63,7 @@ export default {
         },
         refreshDeviceTypeList() {
             this.page.pos = 1;
-            this.$http.cors("/loans/device_type_manager/getDeviceTypeList", {
+            this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
                 name: this.search.name,
                 pro_code: this.search.pro_code,
                 net_code: this.search.net_code,
@@ -74,7 +74,7 @@ export default {
             })
         },
         delDeviceType() {
-            this.$http.cors("/loans/device_type_manager/delDeviceType", {
+            this.$http.cors("php","/loans/device_type_manager/delDeviceType", {
                 "code": this.currentRow.code
             }).then((res) => {
                 if (res.code == 0) {
@@ -88,7 +88,7 @@ export default {
         },
         updateDeviceType(){
             this.$router.push({
-                path :"/DeviceTypeList/DeviceTypeItem",
+                path :"/device_type_list/device_type_item",
                 query :{
                     opt: "update",
                     code: this.currentRow.code

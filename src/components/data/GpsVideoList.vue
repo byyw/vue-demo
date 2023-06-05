@@ -1,126 +1,81 @@
 <template>
     <div>
-        <div id="xxoo1"
-            style="background-color: #333333;border-radius: 10px; overflow: hidden; width: 400px; height: 300px;"></div>
-        <input id="tag1" style="width: 300px;">
-        <button onclick="playVideo(1)">Play Video</button>
+        <el-row>
+            <el-col :span="12">
+                <video autoplay controls width="100%" id="channel_1" @click="videoPlay(1)"></video>
+            </el-col>
+            <el-col :span="12">
+                <video autoplay controls width="100%" id="channel_2" @click="videoPlay(2)"></video>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+                <video autoplay controls width="100%" id="channel_3" @click="videoPlay(3)"></video>
+            </el-col>
+            <el-col :span="12">
+                <video autoplay controls width="100%" id="channel_4" @click="videoPlay(4)"></video>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
-<script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.js"></script>
-<script type="text/javascript">
-    /**
-     * 创建一个FLV播放器，参数如下：
-     * {
-     *      container : 视频容器元素
-     *      muted     : 是否静音
-     *      url       : HTTP-FLV地址
-     * }
-     */
-    function FLVPlayer(opts) {
-        var videoElement = document.createElement('VIDEO');
-        videoElement.autoplay = true;
-        videoElement.controls = false;
-        videoElement.muted = false;
-        videoElement.style.width = '100%';
-        videoElement.style.height = '100%';
-        opts.container.append(videoElement);
-
-        this.container = opts.container;
-        this.videoElement = videoElement;
-        this.httpFlvURL = opts.url;
-
-        this.mediaInfo = null;
-        this.play = null;
-        this.onPlayEvtListener = null;
-        this.onPauseEvtListener = null;
-        this.onStopEvtListener = null;
-
-        this.autoFastForward = opts.autoFastForward;
-        this.autoFastForwardInterval = null;
-
-        this.play = function () {
-            if (this.player) return;
-            var self = this;
-            self.player = new flvjs.createPlayer({
-                type: 'flv',
-                url: self.httpFlvURL,
-                isLive: true,
-                enableWorker: true,
-                enableStashBuffer: true,
-                autoCleanupSourceBuffer: true,
-                autoCleanupMaxBackwardDuration: 5,
-                autoCleanupMinBackwardDuration: 1
-            });
-
-            self.player.on('media_info', function () {
-                self.mediaInfo = self.player.mediaInfo;
-            });
-
-            self.player.on('statistics_info', function () {
-                console.log(arguments);
-            });
-
-            var autoPlayTimer = null;
-            self.videoElement.addEventListener('player', function (e) {
-                if (autoPlayTimer) clearInterval(autoPlayTimer);
-                if (self.onPlayEvtListener) self.onPlayEvtListener(self, e);
-            });
-            self.videoElement.addEventListener('dblclick', function () {
-                if (self.videoElement.requestFullscreen) self.videoElement.requestFullscreen();
-            });
-            autoPlayTimer = setInterval(function () {
-                try { self.player.play(); } catch (e) { clearInterval(autoPlayTimer); };
-            });
-
-            self.player.attachMediaElement(self.videoElement);
-            self.player.load();
-            self.player.play();
-
-            if (this.autoFastForward) this.autoFastForwardInterval = setInterval(function () {
-                if (self.videoElement.buffered.length > 0 && self.videoElement.buffered.end(0) - self.videoElement.currentTime > 2) {
-                    console.log(self.videoElement.buffered.end(0) + "-" + self.videoElement.currentTime);
-                    self.videoElement.currentTime = self.videoElement.buffered.end(0) - 1;
-                }
-            }, 1000);
-        };
-
-        this.fullscreen = function () {
-            if (this.videoElement && this.videoElement.requestFullscreen)
-                this.videoElement.requestFullscreen();
-        };
-
-        this.onPlay = function (fn) {
-            this.onPlayEvtListener = fn;
-        };
-
-        this.destroy = function () {
-            this.player.destroy();
-            clearInterval(this.autoFastForwardInterval);
-        }
-    }
-</script>
-<script type="text/javascript">
-    if (location.hash) {
-        var hash = location.hash.substring(1);
-        $('#tag').val(hash);
-    }
-    function playVideo(i) {
-
-        var videoPlayer = new FLVPlayer({
-            container: $("#xxoo"+i),
-            url: $("#tag"+i).val(),
-            // 自动快进追祯，但是可能会导致画面停顿
-            autoFastForward: false
-        });
-        videoPlayer.play();
-    }
-</script>
 <script>
+
+import flvjs from 'flv.js';
+
+function getUrl(url) {
+    url = url.slice(url.indexOf("://") + 3)
+    var e = url.indexOf("/");
+    if (e != -1)
+        return url.slice(0, e);
+    else
+        return url;
+}
+
 export default {
-    name: "GpsVideoList",
-    mounted(){
-        
+    name: "GpsVideoList", 
+    props: {
+        number: {
+            type: String,
+            required: true
+        }
+    },
+    watch: {
+        number() {
+            // this.videoPlay();
+        }
+    },
+    mounted() {
+        // this.videoPlay();
+    },
+    methods: {
+        async videoPlay(channel) {
+            if (flvjs.isSupported()) {
+                for (var i = 1; i <= 4; i++) {
+                    if (channel && channel != i)
+                        continue;
+                    var res = await this.$http.cors("java","/jtt1078/realtimePlay", {
+                        "simNo": this.number,
+                        "channelNo": i
+                    });
+                    if (res.code != 0) {
+                        this.$alert(res.msg, '错误', {
+                            confirmButtonText: '确定'
+                        });
+                        return;
+                    }
+                    var videoElement = document.getElementById('channel_' + i);
+                    var flvPlayer = flvjs.createPlayer({
+                        type: 'flv',
+                        // url: 'http://192.168.1.77:8083/media/getMediaStream?key=' + res.key //你的url地址
+                        url: 'ws://'+getUrl(this.$http.defaults.baseURL['java'])+'/ws/media?key=' + res.key //你的url地址
+                    });
+                    flvPlayer.attachMediaElement(videoElement);
+                    flvPlayer.load();
+                    flvPlayer.play();
+                }
+            }
+        }
     }
 }
 </script>

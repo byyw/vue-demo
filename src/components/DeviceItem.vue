@@ -47,6 +47,14 @@
 <script>
 export default {
   name: "DeviceItem",
+  props:{
+    id:{
+      type: String
+    },
+    opt:{
+      type: String
+    }
+  },
   data() {
     return {
       form: {
@@ -61,15 +69,12 @@ export default {
         remark: '',
       },
       deviceTypeList: [],
-      mode: ''
     }
   },
   watch: {
     async '$route'(to) {
-      if (to.path != "/DeviceList/DeviceItem")
+      if (to.path != "/device_list/device_item")
         return;
-
-      this.mode = this.$route.query.opt;
 
       this.form = {
         id: '',
@@ -84,9 +89,9 @@ export default {
       }
       this.deviceTypeList = [];
 
-      if (this.mode == 'update') {
-        var d = (await this.$http.cors("/loans/device_manager/getDeviceList", {
-          id: this.$route.query.id
+      if (this.opt == 'update') {
+        var d = (await this.$http.cors("php","/loans/device_manager/getDeviceList", {
+          id: this.id
         })).data[0];
 
         this.form.id = d.id;
@@ -102,13 +107,11 @@ export default {
     }
   },
   async mounted() {
-    this.deviceTypeList = (await this.$http.cors("/loans/device_type_manager/getDeviceTypeList")).data;
+    this.deviceTypeList = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList")).data;
 
-    this.mode = this.$route.query.opt;
-
-    if (this.mode == 'update') {
-      var d = (await this.$http.cors("/loans/device_manager/getDeviceList", {
-        id: this.$route.query.id
+    if (this.opt == 'update') {
+      var d = (await this.$http.cors("php","/loans/device_manager/getDeviceList", {
+        id: this.id
       })).data[0];
 
       this.form.id = d.id;
@@ -124,7 +127,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      if (this.mode == "update")
+      if (this.opt == "update")
         this.updateDevice();
       else
         this.bindDevice();
@@ -133,7 +136,7 @@ export default {
       this.$emit("w_close");
     },
     bindDevice() {
-      this.$http.cors("/loans/device_manager/bindDevice", {
+      this.$http.cors("php","/loans/device_manager/bindDevice", {
         name: this.form.name,
         type: this.form.type.code,
         type_name: this.form.type.name,
@@ -159,7 +162,7 @@ export default {
       })
     },
     updateDevice() {
-      this.$http.cors("/loans/device_manager/updateDevice", {
+      this.$http.cors("php","/loans/device_manager/updateDevice", {
         id: this.form.id,
         name: this.form.name,
         sim_no: this.form.sim_no,

@@ -1,12 +1,17 @@
 import axios from "axios";
 
-const baseURL = 'http://192.168.1.77:8081'
+const baseURL ={
+    "php": 'http://192.168.1.77:8081',
+    "java": 'http://192.168.1.77:8083'
+}
 
 let http = axios.create();
 http.defaults.baseURL = baseURL;
 
-http.cors = (url, params) => {
-    return http.post(url, params);
+http.cors = (server ,url, params) => {
+    if(server == undefined || baseURL[server]==null)
+        return http.post(url, params);
+    return http.post(baseURL[server]+url, params);
 };
 
 // 添加请求拦截器

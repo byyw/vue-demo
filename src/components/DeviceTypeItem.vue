@@ -66,7 +66,7 @@ export default {
   },
   watch: {
     async '$route'(to) {
-      if (to.path != "/DeviceTypeList/DeviceTypeItem")
+      if (to.path != "/device_type_list/device_type_item")
         return;
 
       this.mode = this.$route.query.opt;
@@ -82,7 +82,7 @@ export default {
       this.commandList = [];
 
       if (this.mode == "update") {
-        var d = (await this.$http.cors("/loans/device_type_manager/getDeviceTypeList", {
+        var d = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
           code: this.$route.query.code
         })).data[0];
 
@@ -99,17 +99,17 @@ export default {
     }
   },
   async mounted() {
-    this.protocolList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList", {
+    this.protocolList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
       typecode: "protocol"
     })).data;
-    this.networkList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList", {
+    this.networkList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
       typecode: "network"
     })).data;
 
     this.mode = this.$route.query.opt;
 
     if (this.mode == "update") {
-      var d = (await this.$http.cors("/loans/device_type_manager/getDeviceTypeList", {
+      var d = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
         code: this.$route.query.code
       })).data[0];
 
@@ -126,7 +126,7 @@ export default {
   },
   methods: {
     async handleProChange(value) {
-      this.commandList = (await this.$http.cors("/loans/typecode_manager/getTypecodeList", {
+      this.commandList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
         typecode: value.param
       })).data;
 
@@ -145,7 +145,7 @@ export default {
       this.$emit("w_close");
     },
     addDeviceType() {
-      this.$http.cors("/loans/device_type_manager/addDeviceType", {
+      this.$http.cors("php","/loans/device_type_manager/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
         pro_code: this.form.pro_code.code,
@@ -169,7 +169,7 @@ export default {
       })
     },
     updateDeviceType() {
-      this.$http.cors("/loans/device_type_manager/updateDeviceType", {
+      this.$http.cors("php","/loans/device_type_manager/updateDeviceType", {
         code: this.form.code,
         net_code: this.form.net_code.code,
         net_name: this.form.net_code.message,

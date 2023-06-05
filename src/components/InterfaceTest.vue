@@ -18,9 +18,9 @@ export default {
     name: "InterfaceTest",
     data() {
         return {
-            url: "http://192.168.1.77:8083/jtt1078/realtimePlay",
+            url: "http://192.168.1.77:8083/jtt1078/fileUpload",
             times: 1,
-            request: '{"simNo":"00000000018542820192","channelNo":1,"mediaType":0,"streamType":0}',
+            request: '{"simNo":"18542820192","channelNo":1,"startTime":"230603120000","endTime":"230603121000"}',
             response: ""
         }
     },

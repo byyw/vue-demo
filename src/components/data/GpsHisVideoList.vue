@@ -80,6 +80,12 @@ export default {
   },
   methods: {
     async videoPlay() {
+      if(this.hisData[this.channelNo][this.treeSel] == null){
+        this.$alert('请选择视频', '错误', {
+          confirmButtonText: '确定'
+        });
+        return;
+      }
       if (flvjs.isSupported()) {
         var res = await this.$http.cors("java","/jtt1078/media/history/play", {
           "simNo": this.number,
@@ -105,6 +111,12 @@ export default {
       }
     },
     async videoDownload() {
+      if(this.hisData[this.channelNo][this.treeSel] == null){
+        this.$alert('请选择视频', '错误', {
+          confirmButtonText: '确定'
+        });
+        return;
+      }
       var res = await this.$http.cors("java","/jtt1078/exitFileInServer", {
         "simNo": this.number,
         "channelNo": this.channelNo,

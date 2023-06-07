@@ -34,9 +34,7 @@ export const constantRoutes = [
     {
         path: '/interface_test',
         component: () => import('@/components/InterfaceTest.vue'),
-        meta: { title: '接口测试' },
-        children: [
-        ]
+        meta: { title: '接口测试' }
     },
 ]
 export default new VueRouter({

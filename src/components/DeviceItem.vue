@@ -2,18 +2,18 @@
   <div>
     <el-form ref="DeviceItem" :model="form" label-width="100px">
 
-      <el-form-item label="设备名称" :disabled="mode == 'update'">
+      <el-form-item label="设备名称" :disabled="opt == 'update'">
         <el-input v-model="form.name" placeholder="请输入设备名称" />
       </el-form-item>
 
       <el-form-item label="设备类型">
-        <el-select v-model="form.type" value-key="code" placeholder="请选择设备类型" :disabled="mode == 'update'">
+        <el-select v-model="form.type" value-key="code" placeholder="请选择设备类型" :disabled="opt == 'update'">
           <el-option v-for=" tp in deviceTypeList" :key="tp.code" :label="tp.name" :value="tp"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="设备终端号">
-        <el-input v-model="form.number" placeholder="请输入设备终端号" :disabled="mode == 'update'" />
+        <el-input v-model="form.number" placeholder="请输入设备终端号" :disabled="opt == 'update'" />
       </el-form-item>
 
       <el-form-item label="SIM卡号">
@@ -47,11 +47,11 @@
 <script>
 export default {
   name: "DeviceItem",
-  props:{
-    id:{
+  props: {
+    id: {
       type: String
     },
-    opt:{
+    opt: {
       type: String
     }
   },
@@ -90,7 +90,7 @@ export default {
       this.deviceTypeList = [];
 
       if (this.opt == 'update') {
-        var d = (await this.$http.cors("php","/loans/device_manager/getDeviceList", {
+        var d = (await this.$http.cors("php", "/loans/device_manager/getDeviceList", {
           id: this.id
         })).data[0];
 
@@ -107,10 +107,10 @@ export default {
     }
   },
   async mounted() {
-    this.deviceTypeList = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList")).data;
+    this.deviceTypeList = (await this.$http.cors("php", "/loans/device_type_manager/getDeviceTypeList")).data;
 
     if (this.opt == 'update') {
-      var d = (await this.$http.cors("php","/loans/device_manager/getDeviceList", {
+      var d = (await this.$http.cors("php", "/loans/device_manager/getDeviceList", {
         id: this.id
       })).data[0];
 
@@ -133,10 +133,12 @@ export default {
         this.bindDevice();
     },
     onClose() {
-      this.$emit("w_close");
+      this.$emit("m_res", {
+        "code": "close"
+      });
     },
     bindDevice() {
-      this.$http.cors("php","/loans/device_manager/bindDevice", {
+      this.$http.cors("php", "/loans/device_manager/bindDevice", {
         name: this.form.name,
         type: this.form.type.code,
         type_name: this.form.type.name,
@@ -150,7 +152,9 @@ export default {
         remark: this.form.remark
       }).then((res) => {
         if (res.code == 0)
-          this.$emit("w_success");
+          this.$emit("m_res", {
+            "code": "success"
+          });
         else
           this.$alert(res.msg, '错误', {
             confirmButtonText: '确定'
@@ -162,7 +166,7 @@ export default {
       })
     },
     updateDevice() {
-      this.$http.cors("php","/loans/device_manager/updateDevice", {
+      this.$http.cors("php", "/loans/device_manager/updateDevice", {
         id: this.form.id,
         name: this.form.name,
         sim_no: this.form.sim_no,
@@ -172,7 +176,9 @@ export default {
         remark: this.form.remark
       }).then((res) => {
         if (res.code == 0)
-          this.$emit("w_success");
+          this.$emit("m_res", {
+            "code": "success"
+          });
         else
           this.$alert(res.msg, '错误', {
             confirmButtonText: '确定'

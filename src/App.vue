@@ -3,13 +3,13 @@
     <el-container>
 
 
-      <el-aside width="200px" style="background-color: rgb(255, 255, 255)">
+      <!-- <el-aside width="200px" style="background-color: rgb(255, 255, 255)">
         <el-menu :router="true" class="el-menu-demo">
           <el-menu-item v-for="(r, i) in menuItems" :key="i" :index="String(i)" :route="r.path">
             {{ r.meta.title }}
           </el-menu-item>
         </el-menu>
-      </el-aside>
+      </el-aside> -->
 
 
       <el-main>

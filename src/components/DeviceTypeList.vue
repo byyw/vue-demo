@@ -1,8 +1,8 @@
 <template>
     <div>
         <el-input v-model="search.name" placeholder="类型名称" style="width:200px" />
-        <el-input v-model="search.pro_code" placeholder="协议类型" style="width:200px" />
-        <el-input v-model="search.net_code" placeholder="网络类型" style="width:200px" />
+        <el-input v-model="search.pro_name" placeholder="协议类型" style="width:200px" />
+        <el-input v-model="search.net_name" placeholder="网络类型" style="width:200px" />
         <el-button type="primary" @click="refreshDeviceTypeList">查询</el-button>
         <el-button type="primary" @click="addDeviceType">添加</el-button>
         <el-button type="primary" @click="updateDeviceType">修改</el-button>
@@ -12,8 +12,8 @@
                 @current-change="handlePageChange">
             </el-pagination>
         </div>
-        <el-table ref="deviceTypeList" :data="deviceTypeList" highlight-current-row @current-change="handleCurrentChange"
-            style="width: 100%">
+        <el-table style="width: 100%" ref="deviceTypeList" :data="deviceTypeList" highlight-current-row
+            @current-change="handleCurrentChange">
             <el-table-column prop="code" label="类型代码" width="180" />
             <el-table-column prop="name" label="类型名称" width="180" />
             <el-table-column prop="pro_name" label="协议类型" width="180" />
@@ -21,30 +21,43 @@
             <el-table-column prop="commands" label="协议指令" />
             <el-table-column prop="remark" label="备注" />
         </el-table>
-        <el-dialog title="设备类型" :visible.sync="dialogVisible">
-            <router-view @w_close="dialogClose" @w_success="dialogSuccess"></router-view>
+        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" @close="dialogClose">
+            <DeviceTypeItem v-if="dialogComponent === 'DeviceTypeItem'" :opt="deviceTypeItem.opt"
+                :code="deviceTypeItem.code" @m_res="deviceTypeItemRes">
+            </DeviceTypeItem>
         </el-dialog>
     </div>
 </template>
 
 <script>
 
+import DeviceTypeItem from "./DeviceTypeItem.vue";
+
 export default {
     name: 'DeviceTypeList',
+    components: {
+        DeviceTypeItem: DeviceTypeItem
+    },
     data() {
         return {
-            deviceTypeList: [],
             dialogVisible: false,
+            dialogTitle: "",
+            dialogComponent: "",
+            deviceTypeList: [],
             currentRow: null,
             search: {
                 name: "",
                 pro_code: "",
                 net_code: ""
             },
-            page: { 
+            page: {
                 total: 0,
                 size: 10,
                 pos: 1
+            },
+            deviceTypeItem: {
+                opt: "",
+                code: ""
             }
         }
     },
@@ -53,28 +66,29 @@ export default {
     },
     methods: {
         addDeviceType() {
-            this.$router.push({
-                path :"/device_type_list/device_type_item",
-                query :{
-                    opt: "insert"
-                }
-            });
-            this.dialogVisible = true;
+            this.deviceTypeItem.opt = "insert";
+            this.dialogDisplay("设备类型", "DeviceTypeItem");
         },
         refreshDeviceTypeList() {
             this.page.pos = 1;
-            this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
+            this.$http.cors("php", "/loans/device_type_manager/getDeviceTypeList", {
                 name: this.search.name,
-                pro_code: this.search.pro_code,
-                net_code: this.search.net_code,
+                pro_name: this.search.pro_name,
+                net_name: this.search.net_name,
                 page: this.page
-            }).then((res) => {
+            }).then((res) => { 
                 this.page.total = res.count;
-                this.deviceTypeList = res.data;
+                this.deviceTypeList = res.data; 
             })
         },
         delDeviceType() {
-            this.$http.cors("php","/loans/device_type_manager/delDeviceType", {
+            if (this.currentRow == null) {
+                this.$alert("请选择类型", '提示', {
+                    confirmButtonText: '确定'
+                });
+                return;
+            }
+            this.$http.cors("php", "/loans/device_type_manager/delDeviceType", {
                 "code": this.currentRow.code
             }).then((res) => {
                 if (res.code == 0) {
@@ -86,15 +100,16 @@ export default {
                 }
             })
         },
-        updateDeviceType(){
-            this.$router.push({
-                path :"/device_type_list/device_type_item",
-                query :{
-                    opt: "update",
-                    code: this.currentRow.code
-                }
-            });
-            this.dialogVisible = true;
+        updateDeviceType() {
+            if (this.currentRow == null) {
+                this.$alert("请选择类型", '提示', {
+                    confirmButtonText: '确定'
+                });
+                return;
+            }
+            this.deviceTypeItem.opt = "update";
+            this.deviceTypeItem.code = this.currentRow.code;
+            this.dialogDisplay("设备类型", "DeviceTypeItem");
         },
         handleCurrentChange(val) {
             this.currentRow = val;
@@ -103,14 +118,20 @@ export default {
             this.page.pos = val;
             this.refreshDeviceTypeList();
         },
-        dialogClose() {
-            this.$router.back();
+        deviceTypeItemRes(res) {
+            if (res.code == 'success') {
+                this.refreshDeviceTypeList();
+            }
             this.dialogVisible = false;
         },
-        dialogSuccess() {
-            this.$router.back();
-            this.dialogVisible = false;
-            this.refreshDeviceTypeList();
+        dialogDisplay(title, component) {
+            this.dialogTitle = title;
+            this.dialogVisible = true;
+            this.dialogComponent = component;
+        },
+        dialogClose() {
+            // 取消挂载，再次弹出时回触发组件挂载事件
+            this.dialogComponent = "";
         }
     }
 }

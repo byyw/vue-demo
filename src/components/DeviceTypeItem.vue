@@ -1,17 +1,16 @@
 <template>
   <div>
-
     <el-form ref="DeviceType" :model="form" label-width="80px">
       <el-form-item label="类型代码">
-        <el-input v-model="form.code" placeholder="请输入类型代码" :disabled="mode == 'update'" />
+        <el-input v-model="form.code" placeholder="请输入类型代码" :disabled="opt == 'update'" />
       </el-form-item>
       <el-form-item label="类型名称">
-        <el-input v-model="form.name" placeholder="请输入类型名称" :disabled="mode == 'update'" />
+        <el-input v-model="form.name" placeholder="请输入类型名称" :disabled="opt == 'update'" />
       </el-form-item>
 
       <el-form-item label="协议类型">
         <el-select v-model="form.pro_code" value-key="code" placeholder="请选择协议类型" @change="handleProChange"
-          :disabled="mode == 'update'">
+          :disabled="opt == 'update'">
           <el-option v-for=" pro in protocolList" :key="pro.code" :label="pro.message" :value="pro" />
         </el-select>
       </el-form-item>
@@ -46,7 +45,13 @@
 
 export default {
   name: 'DeviceTypeItem',
-  components: {
+  props: {
+    code: {
+      type: String
+    },
+    opt: {
+      type: String
+    }
   },
   data() {
     return {
@@ -61,91 +66,56 @@ export default {
       protocolList: [],
       networkList: [],
       commandList: [],
-      mode: ''
-    }
-  },
-  watch: {
-    async '$route'(to) {
-      if (to.path != "/device_type_list/device_type_item")
-        return;
-
-      this.mode = this.$route.query.opt;
-
-      this.form = {
-        code: '',
-        name: '',
-        pro_code: '',
-        net_code: '',
-        pro_command: [],
-        remark: '',
-      };
-      this.commandList = [];
-
-      if (this.mode == "update") {
-        var d = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
-          code: this.$route.query.code
-        })).data[0];
-
-        this.form.code = d.code;
-        this.form.name = d.name;
-        this.form.pro_code = this.protocolList.filter(it => it.code == d.pro_code)[0];
-        await this.handleProChange(this.form.pro_code);
-        this.form.pro_command = d.commands == null ? [] : d.commands.split(",");
-        this.form.net_code = this.networkList.filter(it => it.code == d.net_code)[0];
-        this.form.remark = d.remark;
-      } else {
-        this.mode = '';
-      }
     }
   },
   async mounted() {
-    this.protocolList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
+    this.protocolList = (await this.$http.cors("php", "/loans/typecode_manager/getTypecodeList", {
       typecode: "protocol"
     })).data;
-    this.networkList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
+    this.networkList = (await this.$http.cors("php", "/loans/typecode_manager/getTypecodeList", {
       typecode: "network"
     })).data;
 
-    this.mode = this.$route.query.opt;
-
-    if (this.mode == "update") {
-      var d = (await this.$http.cors("php","/loans/device_type_manager/getDeviceTypeList", {
-        code: this.$route.query.code
+    if (this.opt == "update") {
+      var d = (await this.$http.cors("php", "/loans/device_type_manager/getDeviceTypeList", {
+        code: this.code
       })).data[0];
 
       this.form.code = d.code;
       this.form.name = d.name;
       this.form.pro_code = this.protocolList.filter(it => it.code == d.pro_code)[0];
       await this.handleProChange(this.form.pro_code);
-      this.form.pro_command = d.commands.split(",");
+      if(d.commands != null){
+        this.form.pro_command = d.commands.split(",");
+      }
       this.form.net_code = this.networkList.filter(it => it.code == d.net_code)[0];
       this.form.remark = d.remark;
-    } else {
-      this.mode = '';
     }
   },
   methods: {
     async handleProChange(value) {
-      this.commandList = (await this.$http.cors("php","/loans/typecode_manager/getTypecodeList", {
+      this.commandList = (await this.$http.cors("php", "/loans/typecode_manager/getTypecodeList", {
         typecode: value.param
       })).data;
 
       this.form.pro_command = [];
       for (var i = 0; i < this.commandList.length; i++) {
-        this.form.pro_command.push(this.commandList[i].code);
+        this.form.pro_command.push(this.commandList[i].code+"");
       }
     },
     onSubmit() {
-      if (this.mode == "update")
+      if (this.opt == "update")
         this.updateDeviceType();
       else
         this.addDeviceType();
     },
     onClose() {
-      this.$emit("w_close");
+      this.$emit("m_res", {
+        "code": "close"
+      });
     },
     addDeviceType() {
-      this.$http.cors("php","/loans/device_type_manager/addDeviceType", {
+      this.$http.cors("php", "/loans/device_type_manager/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
         pro_code: this.form.pro_code.code,
@@ -157,7 +127,9 @@ export default {
         remark: this.form.remark
       }).then((res) => {
         if (res.code == 0)
-          this.$emit("w_success");
+          this.$emit("m_res", {
+            "code": "success"
+          });
         else
           this.$alert(res.msg, '错误', {
             confirmButtonText: '确定'
@@ -169,7 +141,7 @@ export default {
       })
     },
     updateDeviceType() {
-      this.$http.cors("php","/loans/device_type_manager/updateDeviceType", {
+      this.$http.cors("php", "/loans/device_type_manager/updateDeviceType", {
         code: this.form.code,
         net_code: this.form.net_code.code,
         net_name: this.form.net_code.message,
@@ -178,7 +150,9 @@ export default {
         remark: this.form.remark
       }).then((res) => {
         if (res.code == 0)
-          this.$emit("w_success");
+          this.$emit("m_res", {
+            "code": "success"
+          });
         else
           this.$alert(res.msg, '错误', {
             confirmButtonText: '确定'

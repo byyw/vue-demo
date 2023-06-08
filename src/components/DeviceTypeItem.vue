@@ -83,7 +83,7 @@ export default {
 
       this.form.code = d.code;
       this.form.name = d.name;
-      this.form.pro_code = this.protocolList.filter(it => it.code == d.pro_code)[0];
+      this.form.pro_code = this.protocolList.filter(it => it.codename == d.pro_code)[0];
       await this.handleProChange(this.form.pro_code);
       if(d.commands != null){
         this.form.pro_command = d.commands.split(",");
@@ -118,7 +118,7 @@ export default {
       this.$http.cors("php", "/loans/device_type_manager/addDeviceType", {
         code: this.form.code,
         name: this.form.name,
-        pro_code: this.form.pro_code.code,
+        pro_code: this.form.pro_code.codename,
         pro_name: this.form.pro_code.message,
         net_code: this.form.net_code.code,
         net_name: this.form.net_code.message,

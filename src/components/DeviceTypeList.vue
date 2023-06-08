@@ -47,8 +47,8 @@ export default {
             currentRow: null,
             search: {
                 name: "",
-                pro_code: "",
-                net_code: ""
+                pro_name: "",
+                net_name: ""
             },
             page: {
                 total: 0,

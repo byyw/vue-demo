@@ -210,19 +210,19 @@ export default {
             })
         },
         showData(row) {
-            if (row.pro_code == 0) {
+            if (row.pro_code == 'gps') {
                 this.selNumber = row.number;
                 this.dialogDisplay("设备数据", "GpsDataList");
             }
         },
         showVideo(row) {
-            if (row.pro_code == 0) {
+            if (row.pro_code == 'gps') {
                 this.selNumber = row.number;
                 this.dialogDisplay("设备视频", "GpsVideoList");
             }
         },
         showHisVideo(row) {
-            if (row.pro_code == 0) {
+            if (row.pro_code == 'gps') {
                 this.selNumber = row.number;
                 this.dialogDisplay("历史视频", "GpsHisVideoList");
             }

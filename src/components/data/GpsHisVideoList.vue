@@ -124,7 +124,7 @@ export default {
         "endTime": this.hisData[this.channelNo][this.treeSel].endTime
       });
       if (res.code == 0) {
-        window.location.href = this.$http.defaults.baseURL("java")+"/file" + res.data;
+        window.location.href = this.$http.defaults.baseURL["java"]+"/file" + res.data;
       } else {
         if (res.msg == '设备未上传文件至服务器') {
           this.$confirm('设备未上传文件至服务器，是否开始上传?', '提示', {

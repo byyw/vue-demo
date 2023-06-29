@@ -3,12 +3,12 @@
         <el-input v-model="search.name" placeholder="类型名称" style="width:200px" />
         <el-input v-model="search.pro_name" placeholder="协议类型" style="width:200px" />
         <el-input v-model="search.net_name" placeholder="网络类型" style="width:200px" />
-        <el-button type="primary" @click="refreshDeviceTypeList">查询</el-button>
+        <el-button type="primary" @click="refreshDeviceTypeList()">查询</el-button>
         <el-button type="primary" @click="addDeviceType">添加</el-button>
         <el-button type="primary" @click="updateDeviceType">修改</el-button>
         <el-button type="primary" @click="delDeviceType">删除</el-button>
         <div class="block">
-            <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size"
+            <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size" :current-page="page.pos"
                 @current-change="handlePageChange">
             </el-pagination>
         </div>
@@ -69,16 +69,17 @@ export default {
             this.deviceTypeItem.opt = "insert";
             this.dialogDisplay("设备类型", "DeviceTypeItem");
         },
-        refreshDeviceTypeList() {
-            this.page.pos = 1;
+        refreshDeviceTypeList(pos) {
+            if (pos == null) pos = 1;
+            this.page.pos = pos;
             this.$http.cors("php", "/loans/device_type_manager/getDeviceTypeList", {
                 name: this.search.name,
                 pro_name: this.search.pro_name,
                 net_name: this.search.net_name,
                 page: this.page
-            }).then((res) => { 
+            }).then((res) => {
                 this.page.total = res.count;
-                this.deviceTypeList = res.data; 
+                this.deviceTypeList = res.data;
             })
         },
         delDeviceType() {
@@ -115,8 +116,7 @@ export default {
             this.currentRow = val;
         },
         handlePageChange(val) {
-            this.page.pos = val;
-            this.refreshDeviceTypeList();
+            this.refreshDeviceTypeList(val);
         },
         deviceTypeItemRes(res) {
             if (res.code == 'success') {

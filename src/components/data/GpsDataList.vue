@@ -192,7 +192,7 @@
             <el-table-column prop="memory_to_limit" label="特殊报警录像达到存储阈值报警" />
             <el-table-column prop="lose_alarm" label="视频信号丢失报警状态">
                 <template slot-scope="scope">
-                    <span>{{ scope.row.lose_alarm.toString(2) }}</span>
+                    <span>{{ scope.row.lose_alarm?.toString(2) }}</span>
                 </template>
             </el-table-column>
             <el-table-column prop="shield_alarm" label="视频信号遮挡报警状态" />

@@ -1,8 +1,15 @@
 import axios from "axios";
 
+// dev
+// const baseURL ={
+//     "php": 'http://192.168.1.77:8081',
+//     "java": 'http://192.168.1.77:8083'
+// }
+
+// test
 const baseURL ={
-    "php": 'http://192.168.1.77:8081',
-    "java": 'http://192.168.1.77:8083'
+    "php": 'http://chechuan.hzfjzn.com',
+    "java": 'http://47.94.95.112:8083'
 }
 
 let http = axios.create();

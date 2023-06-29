@@ -7,20 +7,20 @@
             <el-option v-for="item in stateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
         </el-select>
-        <el-select v-model="search.net_state" multiple placeholder="请选择" style="width:200px" >
+        <el-select v-model="search.net_state" multiple placeholder="请选择" style="width:200px">
             <el-option v-for="item in netStateList" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
         </el-select>
         <el-input v-model="search.number" placeholder="终端号" style="width:200px" />
         <el-input v-model="search.sim_no" placeholder="SIM卡号" style="width:200px" />
         <el-input v-model="search.address" placeholder="网络地址" style="width:200px" />
-        <el-button type="primary" @click="refreshDeviceList">查询</el-button>
+        <el-button type="primary" @click="refreshDeviceList()">查询</el-button>
         <el-button type="primary" @click="bindDevice">绑定</el-button>
         <el-button type="primary" @click="unbindDevice">解绑</el-button>
         <el-button type="primary" @click="updateDevice">修改</el-button>
         <el-button type="primary" @click="cleanUnbindOfflineDevice">清除未绑定-离线设备</el-button>
         <div class="block">
-            <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size"
+            <el-pagination layout="prev, pager, next" :total="page.total" :size="page.size" :current-page="page.pos"
                 @current-change="handlePageChange">
             </el-pagination>
         </div>
@@ -116,13 +116,13 @@ export default {
                 value: 1,
                 label: "已绑定"
             }],
-            netStateList:[{
+            netStateList: [{
                 value: 0,
                 label: "tcp开"
-            },{
+            }, {
                 value: 1,
                 label: "http开"
-            },{
+            }, {
                 value: 2,
                 label: "websocket通"
             }]
@@ -133,7 +133,9 @@ export default {
         this.refreshDeviceList();
     },
     methods: {
-        refreshDeviceList() {
+        refreshDeviceList(pos) {
+            if (pos == null) pos = 1;
+            this.page.pos = pos;
             var sc = {
                 name: this.search.name,
                 type_name: this.search.type_name,
@@ -144,12 +146,12 @@ export default {
                 address: this.search.address,
                 page: this.page
             };
-            for(var i=0;i<this.search.net_state.length;i++){
-                if(this.search.net_state[i] == 0){
+            for (var i = 0; i < this.search.net_state.length; i++) {
+                if (this.search.net_state[i] == 0) {
                     sc.tcp_state = 1;
-                } else if(this.search.net_state[i] == 1){
+                } else if (this.search.net_state[i] == 1) {
                     sc.http_state = 1;
-                } else if(this.search.net_state[i] == 2){
+                } else if (this.search.net_state[i] == 2) {
                     sc.ws_state = 1;
                 }
             }
@@ -231,8 +233,7 @@ export default {
             this.currentRow = val;
         },
         handlePageChange(val) {
-            this.page.pos = val;
-            this.refreshDeviceList();
+            this.refreshDeviceList(val);
         },
         dialogDisplay(title, component) {
             this.dialogTitle = title;

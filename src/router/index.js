@@ -11,9 +11,30 @@ Vue.use(VueRouter);
 export const constantRoutes = [
     {
         path: '/index',
-        component: () => import('@/components/HelloWorld.vue'), 
+        component: () => import('@/pages/DeviceList/deviceList.vue'),
         meta: { title: '首页' }
     },
+    {
+        path: '/deviceList123',
+        component: () => import('@/pages/DeviceList/deviceList.vue'),
+        meta: { title: '设备对象列表2' },
+        children: [
+            {
+                path:"DeviceItem",
+                component: () => import('@/components/DeviceItem.vue'),
+                meta: { title: '设备' }
+            },{
+                path:"GpsDataList",
+                component: () => import('@/components/data/GpsDataList.vue'),
+                meta: { title: '定位数据' }
+            },{
+                path:"GpsVideoList",
+                component: () => import('@/components/data/GpsVideoList.vue'),
+                meta: { title: '定位视频' }
+            }
+        ]
+    },
+
     {
         path: '/DeviceTypeList',
         component: () => import('@/components/DeviceTypeList.vue'),
@@ -49,9 +70,7 @@ export const constantRoutes = [
     {
         path: '/InterfaceTest',
         component: () => import('@/components/InterfaceTest.vue'),
-        meta: { title: '接口测试' },
-        children: [
-        ]
+        meta: { title: '接口测试' }
     },
 ]
 export default new VueRouter({

@@ -2,41 +2,51 @@
   <div>
     <el-form ref="DeviceItem" :model="form" label-width="100px">
 
-      <el-form-item label="设备名称" :disabled="opt == 'update'">
-        <el-input v-model="form.name" placeholder="请输入设备名称" />
+      <el-form-item label="设备名称">
+        <el-input v-model="form.name" placeholder="请输入设备名称" :disabled="opt == 'update' || opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="设备类型">
-        <el-select v-model="form.type" value-key="code" placeholder="请选择设备类型" :disabled="opt == 'update'">
+        <el-select v-model="form.type" value-key="code" placeholder="请选择设备类型"
+          :disabled="opt == 'update' || opt == 'look'">
           <el-option v-for=" tp in deviceTypeList" :key="tp.code" :label="tp.name" :value="tp"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="设备终端号">
-        <el-input v-model="form.number" placeholder="请输入设备终端号" :disabled="opt == 'update'" />
+        <el-input v-model="form.number" placeholder="请输入设备终端号" :disabled="opt == 'update' || opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="SIM卡号">
-        <el-input v-model="form.sim_no" placeholder="请输入SIM卡号" />
+        <el-input v-model="form.sim_no" placeholder="请输入SIM卡号" :disabled="opt == 'look'" />
+      </el-form-item>
+
+      <el-form-item label="安装人">
+        <el-input v-model="form.install_person" placeholder="安装人" :disabled="opt == 'look'" />
+      </el-form-item>
+
+      <el-form-item label="安装时间">
+        <el-date-picker v-model="form.install_time" type="datetime" placeholder="选择日期时间"
+          value-format="yyyy-MM-dd HH:mm:ss" :disabled="opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="设备厂家">
-        <el-input v-model="form.factory" placeholder="请输入设备厂家" />
+        <el-input v-model="form.factory" placeholder="请输入设备厂家" :disabled="opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="设备型号">
-        <el-input v-model="form.device_version" placeholder="请输入设备型号" />
+        <el-input v-model="form.device_version" placeholder="请输入设备型号" :disabled="opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="软件版本">
-        <el-input v-model="form.soft_version" placeholder="请输入软件版本" />
+        <el-input v-model="form.soft_version" placeholder="请输入软件版本" :disabled="opt == 'look'" />
       </el-form-item>
 
       <el-form-item label="备注">
-        <el-input v-model="form.remark" placeholder="请输入备注" />
+        <el-input v-model="form.remark" placeholder="请输入备注" :disabled="opt == 'look'" />
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item v-if="opt != 'look'">
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onClose">取消</el-button>
       </el-form-item>
@@ -63,6 +73,8 @@ export default {
         type: '',
         number: '',
         sim_no: "",
+        install_person: "",
+        install_time: "",
         factory: '',
         device_version: '',
         soft_version: '',
@@ -82,6 +94,8 @@ export default {
         type: '',
         number: '',
         sim_no: "",
+        install_person: "",
+        install_time: "",
         factory: '',
         device_version: '',
         soft_version: '',
@@ -89,7 +103,7 @@ export default {
       }
       this.deviceTypeList = [];
 
-      if (this.opt == 'update') {
+      if (this.opt == 'update' || this.opt == 'look') {
         var d = (await this.$http.cors("php", "/loans/device_manager/getDeviceList", {
           id: this.id
         })).data[0];
@@ -99,6 +113,8 @@ export default {
         this.form.type = this.deviceTypeList.filter(it => it.code == d.type)[0];
         this.form.number = d.number;
         this.form.sim_no = d.sim_no;
+        this.form.install_person = d.install_person;
+        this.form.install_time = d.install_time;
         this.form.factory = d.factory;
         this.form.device_version = d.device_version;
         this.form.soft_version = d.soft_version;
@@ -109,7 +125,7 @@ export default {
   async mounted() {
     this.deviceTypeList = (await this.$http.cors("php", "/loans/device_type_manager/getDeviceTypeList")).data;
 
-    if (this.opt == 'update') {
+    if (this.opt == 'update' || this.opt == 'look') {
       var d = (await this.$http.cors("php", "/loans/device_manager/getDeviceList", {
         id: this.id
       })).data[0];
@@ -119,6 +135,8 @@ export default {
       this.form.type = this.deviceTypeList.filter(it => it.code == d.type)[0];
       this.form.number = d.number;
       this.form.sim_no = d.sim_no;
+      this.form.install_person = d.install_person;
+      this.form.install_time = d.install_time;
       this.form.factory = d.factory;
       this.form.device_version = d.device_version;
       this.form.soft_version = d.soft_version;
@@ -146,6 +164,8 @@ export default {
         pro_name: this.form.type.pro_name,
         number: this.form.number,
         sim_no: this.form.sim_no,
+        install_person: this.form.install_person,
+        install_time: this.form.install_time,
         factory: this.form.factory,
         device_version: this.form.device_version,
         soft_version: this.form.soft_version,
@@ -170,6 +190,8 @@ export default {
         id: this.form.id,
         name: this.form.name,
         sim_no: this.form.sim_no,
+        install_person: this.form.install_person,
+        install_time: this.form.install_time,
         factory: this.form.factory,
         device_version: this.form.device_version,
         soft_version: this.form.soft_version,

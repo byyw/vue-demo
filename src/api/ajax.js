@@ -7,7 +7,7 @@ import axios from "axios";
 // }
 
 // test
-const baseURL ={
+const baseURL = {
     "php": 'http://chechuan.hzfjzn.com',
     "java": 'http://47.94.95.112:8083'
 }
@@ -15,10 +15,10 @@ const baseURL ={
 let http = axios.create();
 http.defaults.baseURL = baseURL;
 
-http.cors = (server ,url, params) => {
-    if(server == undefined || baseURL[server]==null)
+http.cors = (server, url, params) => {
+    if (server == undefined || baseURL[server] == null)
         return http.post(url, params);
-    return http.post(baseURL[server]+url, params);
+    return http.post(baseURL[server] + url, params);
 };
 
 // 添加请求拦截器

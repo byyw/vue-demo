@@ -15,28 +15,27 @@ export const constantRoutes = [
         meta: { title: '首页' }
     },
     {
-        path: '/deviceList123',
+        path: '/device_list',
         component: () => import('@/pages/DeviceList/deviceList.vue'),
-        meta: { title: '设备对象列表2' },
+        meta: { title: '设备对象列表' },
         children: [
             {
-                path:"DeviceItem",
+                path: "DeviceItem",
                 component: () => import('@/components/DeviceItem.vue'),
                 meta: { title: '设备' }
-            },{
-                path:"GpsDataList",
+            }, {
+                path: "GpsDataList",
                 component: () => import('@/components/data/GpsDataList.vue'),
                 meta: { title: '定位数据' }
-            },{
-                path:"GpsVideoList",
+            }, {
+                path: "GpsVideoList",
                 component: () => import('@/components/data/GpsVideoList.vue'),
                 meta: { title: '定位视频' }
             }
         ]
     },
-
     {
-        path: '/DeviceTypeList',
+        path: '/device_type_list',
         component: () => import('@/components/DeviceTypeList.vue'),
         meta: { title: '设备类型列表' },
         children: [
@@ -47,11 +46,11 @@ export const constantRoutes = [
             },
         ]
     },
-    {
-        path: '/device_list',
-        component: () => import('@/components/DeviceList.vue'),
-        meta: { title: '设备对象列表' }
-    },
+    // {
+    //     path: '/device_list',
+    //     component: () => import('@/components/DeviceList.vue'),
+    //     meta: { title: '设备对象列表' }
+    // },
     {
         path: '/interface_test',
         component: () => import('@/components/InterfaceTest.vue'),
